@@ -17,7 +17,7 @@ State machine
 (define (extend-env x v r r+ s)
   (define new-addr (gensym))
   (define r-upd (hash-set r x new-addr))
-  (define s-upd (hash-set s new-addr (values v r)))
+  (define s-upd (hash-set s new-addr (cons v r)))
   (values r-upd s-upd)
  )
 
@@ -32,12 +32,16 @@ State machine
     [`((app ,e0 ,e1) ,r ,s ,k)
       `(,e0 ,r ,s (ar ,e1 ,r ,k))
      ]
+    ;(l (x) e1) e2) becomes function application
+   ;[`((λ (,x) ,e) ,r ,s ,k)
+   ;  (print "halt")
+   ;  ]
     ;<v, r, s, ar(e, r',k)>      -> <e, r', s, fn(v, r, k)>
     [`(,v ,r ,s (ar ,e ,r+ ,k))
-     `(,e ,r+ ,s (fn ,v ,r ,k))
+     `(,e ,r+ ,s (fnc ,v ,r ,k))
      ]
     ;<v, r, s, fn((lx.e), r', k)> -> <e, r'[x -> a], s[a -> (v,r)], k> where a !∈ dom(s)
-    [`(,v ,r ,s fnc((λ,x ,e) ,r+ ,k))
+    [`(,v ,r ,s (fnc (λ ,x ,e) ,r+ ,k))
      (define-values (r-upd s-upd) (extend-env x v r r+ s))
      `(,e ,r-upd ,s-upd ,k)
      ]
@@ -47,11 +51,12 @@ State machine
   (define r-init (hash))
   (define s-init (hash))
   (let loop ([i 1] [state `(,expr ,r-init ,s-init mt)])
+   (displayln state)
    (let ([state1 (step state)])
-   (displayln state1)
    (let ([inp (read-line)])
      (when (not (equal? inp "q"))
        (loop (add1 i) state1))))))
 
+(define test0 `(app (λ (x) (app (ref x) (ref x))) (λ (y) (ref y))))
 
-  
+(run-prog test0)  
