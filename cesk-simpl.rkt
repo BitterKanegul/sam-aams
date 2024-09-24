@@ -41,7 +41,7 @@ State machine
      `(,e ,r+ ,s (fnc ,v ,r ,k))
      ]
     ;<v, r, s, fn((lx.e), r', k)> -> <e, r'[x -> a], s[a -> (v,r)], k> where a !∈ dom(s)
-    [`(,v ,r ,s (fnc (λ ,x ,e) ,r+ ,k))
+    [`(,v ,r ,s (fnc (λ (,x) ,e) ,r+ ,k))
      (define-values (r-upd s-upd) (extend-env x v r r+ s))
      `(,e ,r-upd ,s-upd ,k)
      ]
